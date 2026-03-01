@@ -43,6 +43,8 @@ func main() {
 
 	// Setup routes
 	server.setupRoutes()
+	server.reactionHandlers()
+	server.typingHandlers()
 
 	// Start server
 	port := ":8080"
