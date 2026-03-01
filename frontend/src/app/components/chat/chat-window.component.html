@@ -1,0 +1,41 @@
+<div class="chat-window">
+  <div class="messages-container">
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'sent': message.isSent}">
+      <div class="message-content">
+        <div class="message-header">
+          <span class="sender">{{ message.user?.username || 'Unknown' }}</span>
+          <span class="time">{{ message.createdAt | date:'short' }}</span>
+        </div>
+        <p class="text">{{ message.content }}</p>
+        <div class="message-actions" *ngIf="message.isSent">
+          <button mat-icon-button matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="message-input-container">
+    <mat-form-field appearance="outline" class="message-input-field">
+      <mat-label>Type a message...</mat-label>
+      <textarea matInput
+        [(ngModel)]="newMessage"
+        (keydown)="onKeyDown($event)"
+        [disabled]="loading"
+        rows="3"
+        placeholder="Type your message here (Shift+Enter for new line)">
+      </textarea>
+    </mat-form-field>
+    <button mat-raised-button color="primary" 
+      (click)="sendMessage()"
+      [disabled]="!newMessage.trim() || loading">
+      <mat-icon *ngIf="!loading">send</mat-icon>
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      {{ loading ? 'Sending...' : 'Send' }}
+    </button>
+  </div>
+</div>

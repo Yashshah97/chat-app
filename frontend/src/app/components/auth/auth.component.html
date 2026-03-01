@@ -1,0 +1,72 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <h1>{{ isLoginMode ? 'Login' : 'Sign Up' }}</h1>
+      <p class="subtitle">{{ isLoginMode ? 'Welcome back to Chat App' : 'Create a new account' }}</p>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form *ngIf="isLoginMode" (ngSubmit)="login()" #loginFormRef="ngForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" placeholder="Enter your username" 
+            [(ngModel)]="loginForm.username" name="username" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" placeholder="Enter your password" 
+            [(ngModel)]="loginForm.password" name="password" required>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="login()" [disabled]="loading" class="full-width">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          {{ loading ? 'Logging in...' : 'Login' }}
+        </button>
+      </form>
+
+      <form *ngIf="!isLoginMode" (ngSubmit)="register()" #registerFormRef="ngForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" placeholder="Choose a username" 
+            [(ngModel)]="registerForm.username" name="username" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="Enter your email" 
+            [(ngModel)]="registerForm.email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" placeholder="Choose a password" 
+            [(ngModel)]="registerForm.password" name="password" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" placeholder="Confirm your password" 
+            [(ngModel)]="registerForm.confirmPassword" name="confirmPassword" required>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="register()" [disabled]="loading" class="full-width">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          {{ loading ? 'Creating account...' : 'Sign Up' }}
+        </button>
+      </form>
+
+      <mat-error *ngIf="error" class="error-message">
+        {{ error }}
+      </mat-error>
+    </mat-card-content>
+
+    <mat-card-actions align="center">
+      <p>{{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}
+        <button mat-button color="primary" (click)="toggleMode()">
+          {{ isLoginMode ? 'Sign up' : 'Login' }}
+        </button>
+      </p>
+    </mat-card-actions>
+  </mat-card>
+</div>
