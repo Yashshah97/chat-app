@@ -18,6 +18,11 @@ type Server struct {
 }
 
 func main() {
+	// Initialize upload directory
+	if err := initializeUploadDirectory(); err != nil {
+		log.Fatalf("Failed to initialize upload directory: %v", err)
+	}
+
 	// Initialize database
 	db, err := initDatabase()
 	if err != nil {
@@ -75,6 +80,12 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/chats/group", s.createGroupChatHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/messages", s.getChatMessagesHandler)
 	
+	// File upload routes
+	s.router.With(authMiddleware).Post("/api/files/upload", uploadFileHandler)
+	s.router.Get("/api/files/download/{filename}", downloadFileHandler)
+	s.router.With(authMiddleware).Delete("/api/files/delete/{filename}", deleteFileHandler)
+	s.router.Get("/api/files/list", listFilesHandler)
+
 	// WebSocket
 	s.router.With(authMiddleware).Get("/ws/chat/{id}", s.websocketHandler)
 

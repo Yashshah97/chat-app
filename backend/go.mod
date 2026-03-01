@@ -6,6 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/gorilla/websocket v1.5.1
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/google/uuid v1.6.0
 	gorm.io/gorm v1.25.5
 	gorm.io/driver/postgres v1.5.7
 	golang.org/x/crypto v0.22.0
