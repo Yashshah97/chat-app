@@ -1,0 +1,73 @@
+<div class="chat-container" *ngIf="isAuthenticated; else loginPage">
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="side" opened="true" class="sidenav">
+      <mat-toolbar color="primary">
+        <button mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span>Chats</span>
+      </mat-toolbar>
+
+      <mat-list class="chat-list">
+        <div *ngIf="currentUser" class="user-info">
+          <div class="user-avatar">{{ currentUser.username[0].toUpperCase() }}</div>
+          <div class="user-details">
+            <div class="username">{{ currentUser.username }}</div>
+            <div class="status">{{ currentUser.status }}</div>
+          </div>
+        </div>
+
+        <button mat-stroked-button color="primary" (click)="createNewChat()" class="create-chat-btn">
+          <mat-icon>add_comment</mat-icon>
+          New Chat
+        </button>
+
+        <mat-divider></mat-divider>
+
+        <mat-list-item 
+          *ngFor="let chat of chats" 
+          (click)="selectChat(chat)"
+          [class.selected]="selectedChat?.id === chat.id"
+          class="chat-item">
+          <mat-icon matListItemIcon>{{ chat.type === 'group' ? 'group' : 'person' }}</mat-icon>
+          <div matListItemTitle>{{ chat.name }}</div>
+        </mat-list-item>
+      </mat-list>
+
+      <mat-divider></mat-divider>
+
+      <div class="sidenav-footer">
+        <button mat-icon-button (click)="goToProfile()" matTooltip="Profile">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <button mat-icon-button (click)="logout()" matTooltip="Logout">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <mat-toolbar color="primary">
+        <button mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="chat-title" *ngIf="selectedChat">{{ selectedChat.name }}</span>
+        <span class="no-chat" *ngIf="!selectedChat">Select a chat to start messaging</span>
+      </mat-toolbar>
+
+      <div class="chat-content" *ngIf="selectedChat">
+        <app-chat-window [chat]="selectedChat"></app-chat-window>
+      </div>
+
+      <div class="no-selection" *ngIf="!selectedChat">
+        <mat-icon>chat</mat-icon>
+        <p>No chat selected</p>
+        <p>Select a chat or create a new one to start messaging</p>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
+
+<ng-template #loginPage>
+  <app-auth></app-auth>
+</ng-template>

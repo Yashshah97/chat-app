@@ -1,0 +1,38 @@
+# Go
+bin/
+obj/
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+*.test
+*.out
+vendor/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.angular/
+.env.local
+.env.*.local
+
+# IDE
+.DS_Store
+*.iml
+.classpath
+.project
+.c9/
+
+# OS
+Thumbs.db
+.env
+.env.example
