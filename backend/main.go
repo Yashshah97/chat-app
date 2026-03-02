@@ -42,6 +42,9 @@ func main() {
 		&SystemAnalytics{},
 		&UserPresence{},
 		&PresenceHistory{},
+		&ChatSettings{},
+		&UserChatPreference{},
+		&NotificationPreference{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -149,6 +152,15 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/search/advanced", s.advancedSearchHandler)
 	s.router.Get("/api/search/trending", s.getTrendingHandler)
 	s.router.With(authMiddleware).Get("/api/search/history/{userID}", s.getSearchHistoryHandler)
+	
+	// Chat settings routes
+	s.router.With(authMiddleware).Get("/api/chats/{id}/settings", s.getChatSettingsHandler)
+	s.router.With(authMiddleware).Put("/api/chats/{id}/settings", s.updateChatSettingsHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/preferences/{chatID}", s.getUserChatPreferencesHandler)
+	s.router.With(authMiddleware).Put("/api/users/{id}/preferences/{chatID}", s.updateUserChatPreferencesHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/notifications", s.getNotificationPreferencesHandler)
+	s.router.With(authMiddleware).Put("/api/users/{id}/notifications", s.updateNotificationPreferencesHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/mute/{userID}", s.muteChatForUserHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
