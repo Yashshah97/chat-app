@@ -48,6 +48,7 @@ func main() {
 		&PinnedMessage{},
 		&BlockedUser{},
 		&MutedUser{},
+		&ForwardedMessage{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -179,6 +180,11 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Delete("/api/users/{id}/mute/{targetID}", s.unmuteUserHandler)
 	s.router.With(authMiddleware).Get("/api/users/{id}/muted", s.getMutedUsersHandler)
 	s.router.With(authMiddleware).Get("/api/users/{id}/is-blocked-by/{targetID}", s.checkBlockStatusHandler)
+	
+	// Message forwarding routes
+	s.router.With(authMiddleware).Post("/api/messages/{id}/forward", s.forwardMessageHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/forwarded", s.getForwardedMessagesHandler)
+	s.router.With(authMiddleware).Post("/api/messages/{id}/forward-to-multiple", s.forwardToMultipleHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
