@@ -122,6 +122,10 @@ func main() {
 		&PerformanceMetric{},
 		&UsageStatistics{},
 		&ErrorMetric{},
+		&NotificationChannel{},
+		&NotificationSchedule{},
+		&NotificationBatch{},
+		&NotificationLog{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -455,6 +459,17 @@ func (s *Server) setupRoutes() {
 	s.router.Get("/api/analytics/errors", s.getErrorMetricsHandler)
 	s.router.Post("/api/analytics/errors/report", s.reportErrorHandler)
 	s.router.Get("/api/analytics/health", s.getSystemHealthHandler)
+
+	// Notification improvements routes
+	s.router.Get("/api/notifications/channels", s.getNotificationChannelsHandler)
+	s.router.Post("/api/notifications/channels", s.createNotificationChannelHandler)
+	s.router.With(authMiddleware).Post("/api/notifications/schedule", s.scheduleNotificationHandler)
+	s.router.With(authMiddleware).Get("/api/notifications/scheduled", s.getScheduledNotificationsHandler)
+	s.router.Post("/api/notifications/batch", s.createNotificationBatchHandler)
+	s.router.Get("/api/notifications/batches", s.getNotificationBatchesHandler)
+	s.router.With(authMiddleware).Get("/api/notifications/logs", s.getNotificationLogsHandler)
+	s.router.Get("/api/notifications/stats", s.getNotificationStatsHandler)
+	s.router.With(authMiddleware).Delete("/api/notifications/scheduled/{scheduleID}", s.cancelScheduledNotificationHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
