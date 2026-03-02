@@ -135,6 +135,9 @@ func main() {
 		&MessageFilter{},
 		&BatchOperation{},
 		&BatchJob{},
+		&Migration{},
+		&MigrationMap{},
+		&MigrationTemplate{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -504,6 +507,17 @@ func (s *Server) setupRoutes() {
 	s.router.Post("/api/batch/{batchID}/start", s.startBatchOperationHandler)
 	s.router.Get("/api/batch/{batchID}/progress", s.getBatchProgressHandler)
 	s.router.Post("/api/batch/{batchID}/cancel", s.cancelBatchOperationHandler)
+
+	// Migration tools routes
+	s.router.Post("/api/migrations", s.createMigrationHandler)
+	s.router.Get("/api/migrations", s.getMigrationsHandler)
+	s.router.Get("/api/migrations/{migrationID}", s.getMigrationHandler)
+	s.router.Post("/api/migrations/{migrationID}/start", s.startMigrationHandler)
+	s.router.Get("/api/migrations/{migrationID}/progress", s.getMigrationProgressHandler)
+	s.router.Post("/api/migrations/{migrationID}/maps", s.createMigrationMapHandler)
+	s.router.Get("/api/migrations/templates", s.getMigrationTemplatesHandler)
+	s.router.Post("/api/migrations/validate", s.validateMigrationHandler)
+	s.router.Get("/api/migrations/stats", s.getMigrationStatsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
