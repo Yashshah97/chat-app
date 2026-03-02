@@ -118,6 +118,10 @@ func main() {
 		&DataEncryption{},
 		&SecureDelete{},
 		&AuditAction{},
+		&AnalyticsMetric{},
+		&PerformanceMetric{},
+		&UsageStatistics{},
+		&ErrorMetric{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -441,6 +445,16 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/security/request-secure-delete", s.requestSecureDeleteHandler)
 	s.router.With(authMiddleware).Get("/api/security/encryption-status", s.getDataEncryptionStatusHandler)
 	s.router.With(authMiddleware).Post("/api/security/enable-e2e", s.enableEndToEndEncryptionHandler)
+
+	// Enhanced analytics routes
+	s.router.Post("/api/analytics/metrics", s.recordAnalyticsMetricHandler)
+	s.router.Get("/api/analytics/metrics/{metricKey}", s.getAnalyticsMetricsHandler)
+	s.router.Post("/api/analytics/performance", s.recordPerformanceMetricHandler)
+	s.router.Get("/api/analytics/performance/stats", s.getPerformanceStatsHandler)
+	s.router.With(authMiddleware).Get("/api/analytics/usage", s.getUserUsageStatsHandler)
+	s.router.Get("/api/analytics/errors", s.getErrorMetricsHandler)
+	s.router.Post("/api/analytics/errors/report", s.reportErrorHandler)
+	s.router.Get("/api/analytics/health", s.getSystemHealthHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
