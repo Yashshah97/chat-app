@@ -46,6 +46,8 @@ func main() {
 		&UserChatPreference{},
 		&NotificationPreference{},
 		&PinnedMessage{},
+		&BlockedUser{},
+		&MutedUser{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -168,6 +170,15 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Delete("/api/messages/{id}/pin", s.unpinMessageHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/pinned", s.getPinnedMessagesHandler)
 	s.router.With(authMiddleware).Get("/api/messages/{id}/pin-status", s.checkPinStatusHandler)
+	
+	// User blocking and muting routes
+	s.router.With(authMiddleware).Post("/api/users/{id}/block/{targetID}", s.blockUserHandler)
+	s.router.With(authMiddleware).Delete("/api/users/{id}/block/{targetID}", s.unblockUserHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/blocked", s.getBlockedUsersHandler)
+	s.router.With(authMiddleware).Post("/api/users/{id}/mute/{targetID}", s.muteUserHandler)
+	s.router.With(authMiddleware).Delete("/api/users/{id}/mute/{targetID}", s.unmuteUserHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/muted", s.getMutedUsersHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/is-blocked-by/{targetID}", s.checkBlockStatusHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
