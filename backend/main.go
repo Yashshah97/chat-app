@@ -63,6 +63,11 @@ func main() {
 		&ChatExport{},
 		&BackupSchedule{},
 		&ArchiveMessage{},
+		&Permission{},
+		&Role{},
+		&UserRole{},
+		&ChatPermission{},
+		&PermissionAudit{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -261,6 +266,19 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/archives/message", s.archiveMessageHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/archived-messages", s.getArchivedMessagesHandler)
 	s.router.With(authMiddleware).Post("/api/backups/{id}/download", s.downloadBackupHandler)
+
+	// Permission and role management routes
+	s.router.With(authMiddleware).Post("/api/permissions", s.createPermissionHandler)
+	s.router.Get("/api/permissions", s.listPermissionsHandler)
+	s.router.With(authMiddleware).Post("/api/roles", s.createRoleHandler)
+	s.router.Get("/api/roles", s.listRolesHandler)
+	s.router.With(authMiddleware).Post("/api/roles/{id}/permissions/{permID}", s.addPermissionToRoleHandler)
+	s.router.With(authMiddleware).Post("/api/users/{id}/roles/{roleID}", s.assignRoleToUserHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/roles", s.getUserRolesHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/roles/{roleID}/users/{userID}", s.assignChatRoleHandler)
+	s.router.With(authMiddleware).Delete("/api/users/{id}/roles/{roleID}", s.revokeRoleHandler)
+	s.router.With(authMiddleware).Get("/api/permissions/audit", s.getPermissionAuditHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/permissions", s.getUserPermissionsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
