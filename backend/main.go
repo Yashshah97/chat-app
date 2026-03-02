@@ -131,6 +131,8 @@ func main() {
 		&MemoryMetric{},
 		&DatabaseMetric{},
 		&ServiceMetric{},
+		&FilterRule{},
+		&MessageFilter{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -484,6 +486,13 @@ func (s *Server) setupRoutes() {
 	s.router.Post("/api/performance/alerts", s.createPerformanceAlertHandler)
 	s.router.Get("/api/performance/alerts", s.getPerformanceAlertsHandler)
 	s.router.Get("/api/performance/system", s.getSystemPerformanceHandler)
+
+	// Advanced filtering routes
+	s.router.With(authMiddleware).Post("/api/filters/rules", s.createFilterRuleHandler)
+	s.router.With(authMiddleware).Get("/api/filters/rules", s.getFilterRulesHandler)
+	s.router.With(authMiddleware).Post("/api/filters/messages", s.createMessageFilterHandler)
+	s.router.With(authMiddleware).Post("/api/filters/messages/apply", s.applyMessageFilterHandler)
+	s.router.With(authMiddleware).Get("/api/filters/messages", s.getMessageFiltersHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
