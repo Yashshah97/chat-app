@@ -77,6 +77,9 @@ func main() {
 		&RateLimitViolation{},
 		&APIVersion{},
 		&APIEndpoint{},
+		&VoiceCall{},
+		&CallParticipant{},
+		&CallLog{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -311,6 +314,16 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/api-endpoints", s.registerAPIEndpointHandler)
 	s.router.Get("/api/api-endpoints", s.listAPIEndpointsHandler)
 	s.router.Get("/api/api-docs", s.getAPIDocsHandler)
+
+	// Voice/audio call routes
+	s.router.With(authMiddleware).Post("/api/chats/{id}/calls", s.initiateCallHandler)
+	s.router.With(authMiddleware).Get("/api/calls/{id}", s.getCallDetailsHandler)
+	s.router.With(authMiddleware).Post("/api/calls/{id}/join", s.joinCallHandler)
+	s.router.With(authMiddleware).Post("/api/calls/{id}/end", s.endCallHandler)
+	s.router.With(authMiddleware).Get("/api/calls/{id}/participants", s.getCallParticipantsHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/call-history", s.getCallHistoryHandler)
+	s.router.With(authMiddleware).Post("/api/call-logs", s.createCallLogHandler)
+	s.router.With(authMiddleware).Get("/api/calls/{id}/logs", s.getCallLogsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
