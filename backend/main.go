@@ -59,6 +59,10 @@ func main() {
 		&UserEmojiPack{},
 		&MessageEmoji{},
 		&EmojiPackReview{},
+		&ChatBackup{},
+		&ChatExport{},
+		&BackupSchedule{},
+		&ArchiveMessage{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -244,6 +248,19 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/messages/{id}/emoji-react", s.addMessageEmojiHandler)
 	s.router.Get("/api/emoji-packs/{id}/reviews", s.getPackReviewsHandler)
 	s.router.With(authMiddleware).Post("/api/emoji-packs/{id}/reviews", s.createPackReviewHandler)
+
+	// Chat backup and export routes
+	s.router.With(authMiddleware).Post("/api/chats/{id}/backup", s.createChatBackupHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/backups", s.listChatBackupsHandler)
+	s.router.With(authMiddleware).Get("/api/backups/{id}", s.getBackupDetailsHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/export", s.createChatExportHandler)
+	s.router.With(authMiddleware).Get("/api/exports/{id}", s.getExportDetailsHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/backup-schedule", s.createBackupScheduleHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/backup-schedule", s.getBackupScheduleHandler)
+	s.router.With(authMiddleware).Delete("/api/backups/{id}", s.deleteBackupHandler)
+	s.router.With(authMiddleware).Post("/api/archives/message", s.archiveMessageHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/archived-messages", s.getArchivedMessagesHandler)
+	s.router.With(authMiddleware).Post("/api/backups/{id}/download", s.downloadBackupHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
