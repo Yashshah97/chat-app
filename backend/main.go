@@ -68,6 +68,10 @@ func main() {
 		&UserRole{},
 		&ChatPermission{},
 		&PermissionAudit{},
+		&Webhook{},
+		&WebhookEvent{},
+		&WebhookLog{},
+		&IncomingWebhook{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -279,6 +283,17 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Delete("/api/users/{id}/roles/{roleID}", s.revokeRoleHandler)
 	s.router.With(authMiddleware).Get("/api/permissions/audit", s.getPermissionAuditHandler)
 	s.router.With(authMiddleware).Get("/api/users/{id}/permissions", s.getUserPermissionsHandler)
+
+	// Webhook routes
+	s.router.With(authMiddleware).Post("/api/webhooks", s.createWebhookHandler)
+	s.router.With(authMiddleware).Get("/api/webhooks", s.listWebhooksHandler)
+	s.router.With(authMiddleware).Get("/api/webhooks/{id}", s.getWebhookHandler)
+	s.router.With(authMiddleware).Put("/api/webhooks/{id}", s.updateWebhookHandler)
+	s.router.With(authMiddleware).Delete("/api/webhooks/{id}", s.deleteWebhookHandler)
+	s.router.With(authMiddleware).Get("/api/webhooks/{id}/events", s.getWebhookEventsHandler)
+	s.router.With(authMiddleware).Get("/api/webhooks/{id}/logs", s.getWebhookLogsHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/incoming-webhooks", s.createIncomingWebhookHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/incoming-webhooks", s.listIncomingWebhooksHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
