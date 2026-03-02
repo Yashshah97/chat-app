@@ -54,6 +54,11 @@ func main() {
 		&NotificationTemplate{},
 		&MessageEdit{},
 		&UserActivityLog{},
+		&EmojiPack{},
+		&Emoji{},
+		&UserEmojiPack{},
+		&MessageEmoji{},
+		&EmojiPackReview{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -227,6 +232,18 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/audit/stats", s.getActivityStatsHandler)
 	s.router.With(authMiddleware).Delete("/api/audit/logs/{id}", s.deleteActivityLogHandler)
 	s.router.With(authMiddleware).Get("/api/audit/suspicious", s.getSuspiciousActivityHandler)
+
+	// Emoji and sticker pack routes
+	s.router.With(authMiddleware).Post("/api/emoji-packs", s.createEmojiPackHandler)
+	s.router.Get("/api/emoji-packs", s.listEmojiPacksHandler)
+	s.router.Get("/api/emoji-packs/{id}", s.getEmojiPackHandler)
+	s.router.With(authMiddleware).Post("/api/emoji-packs/{id}/emojis", s.addEmojiHandler)
+	s.router.Get("/api/emoji-packs/{id}/emojis", s.getPackEmojisHandler)
+	s.router.With(authMiddleware).Post("/api/users/{id}/emoji-packs/{packID}/subscribe", s.subscribeEmojiPackHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/emoji-packs", s.getUserEmojiPacksHandler)
+	s.router.With(authMiddleware).Post("/api/messages/{id}/emoji-react", s.addMessageEmojiHandler)
+	s.router.Get("/api/emoji-packs/{id}/reviews", s.getPackReviewsHandler)
+	s.router.With(authMiddleware).Post("/api/emoji-packs/{id}/reviews", s.createPackReviewHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
