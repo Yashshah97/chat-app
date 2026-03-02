@@ -45,6 +45,7 @@ func main() {
 	server.setupRoutes()
 	server.reactionHandlers()
 	server.typingHandlers()
+	server.readReceiptHandlers()
 
 	// Start server
 	port := ":8080"
