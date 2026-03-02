@@ -113,6 +113,11 @@ func main() {
 		&TrustedDevice{},
 		&SecurityIncident{},
 		&OAuthToken{},
+		&EncryptionKey{},
+		&PasswordPolicy{},
+		&DataEncryption{},
+		&SecureDelete{},
+		&AuditAction{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -424,6 +429,18 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/security/policy", s.updateSecurityPolicyHandler)
 	s.router.With(authMiddleware).Post("/api/security/trusted-devices", s.registerTrustedDeviceHandler)
 	s.router.With(authMiddleware).Get("/api/security/trusted-devices", s.getTrustedDevicesHandler)
+
+	// Advanced security routes
+	s.router.With(authMiddleware).Post("/api/security/validate-password", s.validatePasswordHandler)
+	s.router.With(authMiddleware).Post("/api/security/encryption-keys", s.createEncryptionKeyHandler)
+	s.router.With(authMiddleware).Get("/api/security/encryption-keys", s.getEncryptionKeysHandler)
+	s.router.Get("/api/security/password-policy", s.getPasswordPolicyHandler)
+	s.router.With(authMiddleware).Put("/api/security/password-policy", s.updatePasswordPolicyHandler)
+	s.router.With(authMiddleware).Get("/api/security/audit-actions", s.getAuditActionsHandler)
+	s.router.With(authMiddleware).Get("/api/security/secure-deletes", s.getSecureDeletesHandler)
+	s.router.With(authMiddleware).Post("/api/security/request-secure-delete", s.requestSecureDeleteHandler)
+	s.router.With(authMiddleware).Get("/api/security/encryption-status", s.getDataEncryptionStatusHandler)
+	s.router.With(authMiddleware).Post("/api/security/enable-e2e", s.enableEndToEndEncryptionHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
