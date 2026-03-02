@@ -80,6 +80,10 @@ func main() {
 		&VoiceCall{},
 		&CallParticipant{},
 		&CallLog{},
+		&Integration{},
+		&IntegrationEvent{},
+		&IntegrationMapping{},
+		&APIKeyConfig{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -324,6 +328,18 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/chats/{id}/call-history", s.getCallHistoryHandler)
 	s.router.With(authMiddleware).Post("/api/call-logs", s.createCallLogHandler)
 	s.router.With(authMiddleware).Get("/api/calls/{id}/logs", s.getCallLogsHandler)
+
+	// Integration routes
+	s.router.With(authMiddleware).Post("/api/integrations", s.createIntegrationHandler)
+	s.router.With(authMiddleware).Get("/api/integrations", s.listIntegrationsHandler)
+	s.router.With(authMiddleware).Get("/api/integrations/{id}", s.getIntegrationHandler)
+	s.router.With(authMiddleware).Put("/api/integrations/{id}", s.updateIntegrationHandler)
+	s.router.With(authMiddleware).Delete("/api/integrations/{id}", s.deleteIntegrationHandler)
+	s.router.With(authMiddleware).Post("/api/integrations/{id}/mappings", s.createIntegrationMappingHandler)
+	s.router.With(authMiddleware).Get("/api/integrations/{id}/mappings", s.getIntegrationMappingsHandler)
+	s.router.With(authMiddleware).Get("/api/integrations/{id}/events", s.getIntegrationEventsHandler)
+	s.router.With(authMiddleware).Post("/api/integrations/{id}/sync", s.triggerIntegrationSyncHandler)
+	s.router.Get("/api/integrations/types/available", s.getAvailableIntegrationTypesHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
