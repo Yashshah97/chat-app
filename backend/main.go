@@ -103,6 +103,16 @@ func main() {
 		&Invitation{},
 		&TrendingTopic{},
 		&SummaryStatistics{},
+		&TwoFactorAuth{},
+		&SecurityKey{},
+		&LoginAttempt{},
+		&SessionToken{},
+		&PasswordHistory{},
+		&SecurityPolicy{},
+		&FailedPasswordAttempt{},
+		&TrustedDevice{},
+		&SecurityIncident{},
+		&OAuthToken{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -402,6 +412,18 @@ func (s *Server) setupRoutes() {
 	s.router.Get("/api/trending", s.getTrendingTopicsHandler)
 	s.router.Get("/api/statistics/summary", s.getSummaryStatisticsHandler)
 	s.router.With(authMiddleware).Post("/api/statistics/summary", s.createSummaryStatisticsHandler)
+
+	// Security and 2FA routes
+	s.router.With(authMiddleware).Post("/api/security/2fa/enable", s.enable2FAHandler)
+	s.router.With(authMiddleware).Post("/api/security/2fa/verify/{id}", s.verify2FAHandler)
+	s.router.With(authMiddleware).Get("/api/security/status", s.getSecurityStatusHandler)
+	s.router.With(authMiddleware).Get("/api/security/login-attempts", s.getLoginAttemptsHandler)
+	s.router.With(authMiddleware).Get("/api/security/sessions", s.getSessionsHandler)
+	s.router.With(authMiddleware).Delete("/api/security/sessions/{sessionID}", s.revokeSessionHandler)
+	s.router.With(authMiddleware).Get("/api/security/incidents", s.getSecurityIncidentsHandler)
+	s.router.With(authMiddleware).Post("/api/security/policy", s.updateSecurityPolicyHandler)
+	s.router.With(authMiddleware).Post("/api/security/trusted-devices", s.registerTrustedDeviceHandler)
+	s.router.With(authMiddleware).Get("/api/security/trusted-devices", s.getTrustedDevicesHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
