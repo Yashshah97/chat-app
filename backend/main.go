@@ -98,6 +98,11 @@ func main() {
 		&SearchIndex{},
 		&SavedSearch{},
 		&ContentPolicy{},
+		&Badge{},
+		&UserBadge{},
+		&Invitation{},
+		&TrendingTopic{},
+		&SummaryStatistics{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -386,6 +391,17 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/search/advanced", s.advancedSearchWithIndexHandler)
 	s.router.With(authMiddleware).Post("/api/content-policies", s.createContentPolicyHandler)
 	s.router.Get("/api/content-policies", s.listContentPoliciesHandler)
+
+	// Gamification routes
+	s.router.With(authMiddleware).Post("/api/badges", s.createBadgeHandler)
+	s.router.Get("/api/badges", s.getAllBadgesHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/badges", s.getUserBadgesHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/invitations", s.sendInvitationHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/invitations", s.getChatInvitationsHandler)
+	s.router.Post("/api/invitations/{token}/accept", s.acceptInvitationHandler)
+	s.router.Get("/api/trending", s.getTrendingTopicsHandler)
+	s.router.Get("/api/statistics/summary", s.getSummaryStatisticsHandler)
+	s.router.With(authMiddleware).Post("/api/statistics/summary", s.createSummaryStatisticsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
