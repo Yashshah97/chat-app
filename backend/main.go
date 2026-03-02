@@ -140,6 +140,12 @@ func (s *Server) setupRoutes() {
 	s.router.Get("/api/presence/online", s.getOnlineUsersCountHandler)
 	s.router.With(authMiddleware).Post("/api/presence/set-away", s.setUserAwayHandler)
 	s.router.With(authMiddleware).Post("/api/presence/history", s.logPresenceHistoryHandler)
+	
+	// Search routes
+	s.router.With(authMiddleware).Post("/api/search/messages", s.searchMessagesHandler)
+	s.router.With(authMiddleware).Get("/api/search/messages/chat/{id}", s.searchChatMessagesHandler)
+	s.router.With(authMiddleware).Get("/api/search/users", s.searchUsersHandler)
+	s.router.With(authMiddleware).Get("/api/search/chats", s.searchChatsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
