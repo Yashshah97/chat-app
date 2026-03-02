@@ -89,6 +89,10 @@ func main() {
 		&ChatBot{},
 		&BotIntent{},
 		&ChatStatistics{},
+		&DataExport{},
+		&FileManagement{},
+		&UserDataRequest{},
+		&AuditLogEntry{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -356,6 +360,16 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/chatbots/{id}/intents", s.getBotIntentsHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/statistics", s.getChatStatisticsHandler)
 	s.router.With(authMiddleware).Post("/api/chats/{id}/statistics", s.recordChatStatisticsHandler)
+
+	// Data export and file management routes
+	s.router.With(authMiddleware).Post("/api/users/{id}/data-export", s.requestDataExportHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/data-exports", s.listDataExportsHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/files", s.uploadFileToChatHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/files", s.listChatFilesHandler)
+	s.router.With(authMiddleware).Post("/api/users/{id}/data-request", s.submitUserDataRequestHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/data-requests", s.getUserDataRequestsHandler)
+	s.router.With(authMiddleware).Post("/api/audit-logs", s.createAuditLogEntryHandler)
+	s.router.With(authMiddleware).Get("/api/audit-logs", s.getAuditLogsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
