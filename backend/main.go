@@ -112,6 +112,14 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Delete("/api/admin/chats/{id}", s.deleteChatHandler)
 	s.router.With(authMiddleware).Post("/api/admin/chats/{id}/remove-member/{memberID}", s.removeChatMemberHandler)
 	s.router.With(authMiddleware).Post("/api/admin/chats/{id}/mute", s.muteChatHandler)
+	
+	// Admin routes - Moderation & Reporting
+	s.router.Post("/api/reports", s.createReportHandler)
+	s.router.With(authMiddleware).Get("/api/admin/reports", s.listReportsHandler)
+	s.router.With(authMiddleware).Get("/api/admin/reports/{id}", s.getReportDetailsHandler)
+	s.router.With(authMiddleware).Post("/api/admin/reports/{id}/resolve", s.resolveReportHandler)
+	s.router.With(authMiddleware).Post("/api/admin/actions", s.logAdminActionHandler)
+	s.router.With(authMiddleware).Get("/api/admin/actions", s.listAdminActionsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
