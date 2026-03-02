@@ -45,6 +45,7 @@ func main() {
 		&ChatSettings{},
 		&UserChatPreference{},
 		&NotificationPreference{},
+		&PinnedMessage{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -161,6 +162,12 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/users/{id}/notifications", s.getNotificationPreferencesHandler)
 	s.router.With(authMiddleware).Put("/api/users/{id}/notifications", s.updateNotificationPreferencesHandler)
 	s.router.With(authMiddleware).Post("/api/chats/{id}/mute/{userID}", s.muteChatForUserHandler)
+	
+	// Message pinning routes
+	s.router.With(authMiddleware).Post("/api/messages/{id}/pin", s.pinMessageHandler)
+	s.router.With(authMiddleware).Delete("/api/messages/{id}/pin", s.unpinMessageHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/pinned", s.getPinnedMessagesHandler)
+	s.router.With(authMiddleware).Get("/api/messages/{id}/pin-status", s.checkPinStatusHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
