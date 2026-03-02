@@ -40,6 +40,8 @@ func main() {
 		&ChatAnalytics{},
 		&UserAnalytics{},
 		&SystemAnalytics{},
+		&UserPresence{},
+		&PresenceHistory{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -130,6 +132,14 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/analytics/user/{id}", s.getUserAnalyticsHandler)
 	s.router.With(authMiddleware).Post("/api/analytics/compute", s.computeAnalyticsHandler)
 	s.router.With(authMiddleware).Get("/api/analytics/dashboard", s.getAnalyticsDashboardHandler)
+	
+	// Presence/Online status routes
+	s.router.With(authMiddleware).Post("/api/presence/update", s.updatePresenceHandler)
+	s.router.With(authMiddleware).Get("/api/presence/user/{id}", s.getUserPresenceHandler)
+	s.router.With(authMiddleware).Get("/api/presence/chat/{id}/members", s.getChatMembersPresenceHandler)
+	s.router.Get("/api/presence/online", s.getOnlineUsersCountHandler)
+	s.router.With(authMiddleware).Post("/api/presence/set-away", s.setUserAwayHandler)
+	s.router.With(authMiddleware).Post("/api/presence/history", s.logPresenceHistoryHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
