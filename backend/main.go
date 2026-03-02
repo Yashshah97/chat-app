@@ -30,7 +30,14 @@ func main() {
 	}
 
 	// Run migrations
-	err = db.AutoMigrate(&User{}, &Message{}, &Chat{})
+	err = db.AutoMigrate(
+		&User{}, 
+		&Message{}, 
+		&Chat{},
+		&AdminUser{},
+		&AdminAction{},
+		&UserReport{},
+	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -91,6 +98,20 @@ func (s *Server) setupRoutes() {
 
 	// WebSocket
 	s.router.With(authMiddleware).Get("/ws/chat/{id}", s.websocketHandler)
+	
+	// Admin routes - User management
+	s.router.With(authMiddleware).Get("/api/admin/users", s.listUsersHandler)
+	s.router.With(authMiddleware).Get("/api/admin/users/{id}", s.getUserDetailsHandler)
+	s.router.With(authMiddleware).Post("/api/admin/users/{id}/suspend", s.suspendUserHandler)
+	s.router.With(authMiddleware).Post("/api/admin/users/{id}/unsuspend", s.unsuspendUserHandler)
+	s.router.With(authMiddleware).Delete("/api/admin/users/{id}", s.deleteUserHandler)
+	
+	// Admin routes - Chat management
+	s.router.With(authMiddleware).Get("/api/admin/chats", s.listChatsHandler)
+	s.router.With(authMiddleware).Get("/api/admin/chats/{id}", s.getChatDetailsHandler)
+	s.router.With(authMiddleware).Delete("/api/admin/chats/{id}", s.deleteChatHandler)
+	s.router.With(authMiddleware).Post("/api/admin/chats/{id}/remove-member/{memberID}", s.removeChatMemberHandler)
+	s.router.With(authMiddleware).Post("/api/admin/chats/{id}/mute", s.muteChatHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
