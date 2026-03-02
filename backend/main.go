@@ -84,6 +84,11 @@ func main() {
 		&IntegrationEvent{},
 		&IntegrationMapping{},
 		&APIKeyConfig{},
+		&MessageTemplate{},
+		&QuickReply{},
+		&ChatBot{},
+		&BotIntent{},
+		&ChatStatistics{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -340,6 +345,17 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/integrations/{id}/events", s.getIntegrationEventsHandler)
 	s.router.With(authMiddleware).Post("/api/integrations/{id}/sync", s.triggerIntegrationSyncHandler)
 	s.router.Get("/api/integrations/types/available", s.getAvailableIntegrationTypesHandler)
+
+	// Message templates and chatbot routes
+	s.router.With(authMiddleware).Post("/api/message-templates", s.createMessageTemplateHandler)
+	s.router.With(authMiddleware).Get("/api/message-templates", s.listMessageTemplatesHandler)
+	s.router.With(authMiddleware).Get("/api/message-templates/{id}", s.getMessageTemplateHandler)
+	s.router.With(authMiddleware).Post("/api/chatbots", s.createChatBotHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/chatbots", s.listChatBotsHandler)
+	s.router.With(authMiddleware).Post("/api/chatbots/{id}/intents", s.createBotIntentHandler)
+	s.router.With(authMiddleware).Get("/api/chatbots/{id}/intents", s.getBotIntentsHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/statistics", s.getChatStatisticsHandler)
+	s.router.With(authMiddleware).Post("/api/chats/{id}/statistics", s.recordChatStatisticsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
