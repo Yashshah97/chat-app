@@ -133,6 +133,8 @@ func main() {
 		&ServiceMetric{},
 		&FilterRule{},
 		&MessageFilter{},
+		&BatchOperation{},
+		&BatchJob{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -493,6 +495,15 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/filters/messages", s.createMessageFilterHandler)
 	s.router.With(authMiddleware).Post("/api/filters/messages/apply", s.applyMessageFilterHandler)
 	s.router.With(authMiddleware).Get("/api/filters/messages", s.getMessageFiltersHandler)
+
+	// Batch operations routes
+	s.router.With(authMiddleware).Post("/api/batch/operations", s.createBatchOperationHandler)
+	s.router.Get("/api/batch/operations", s.getBatchOperationsHandler)
+	s.router.Get("/api/batch/{batchID}/jobs", s.getBatchJobsHandler)
+	s.router.Post("/api/batch/{batchID}/jobs", s.addBatchJobsHandler)
+	s.router.Post("/api/batch/{batchID}/start", s.startBatchOperationHandler)
+	s.router.Get("/api/batch/{batchID}/progress", s.getBatchProgressHandler)
+	s.router.Post("/api/batch/{batchID}/cancel", s.cancelBatchOperationHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
