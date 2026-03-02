@@ -93,6 +93,11 @@ func main() {
 		&FileManagement{},
 		&UserDataRequest{},
 		&AuditLogEntry{},
+		&UserProfile{},
+		&UserStatus{},
+		&SearchIndex{},
+		&SavedSearch{},
+		&ContentPolicy{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -370,6 +375,17 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/users/{id}/data-requests", s.getUserDataRequestsHandler)
 	s.router.With(authMiddleware).Post("/api/audit-logs", s.createAuditLogEntryHandler)
 	s.router.With(authMiddleware).Get("/api/audit-logs", s.getAuditLogsHandler)
+
+	// User profiles and status routes
+	s.router.With(authMiddleware).Get("/api/users/{id}/profile", s.getUserProfileHandler)
+	s.router.With(authMiddleware).Put("/api/users/{id}/profile", s.updateUserProfileHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/status", s.getUserStatusHandler)
+	s.router.With(authMiddleware).Put("/api/users/{id}/status", s.updateUserStatusHandler)
+	s.router.With(authMiddleware).Post("/api/saved-searches", s.saveSearchHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/saved-searches", s.getSavedSearchesHandler)
+	s.router.With(authMiddleware).Get("/api/search/advanced", s.advancedSearchWithIndexHandler)
+	s.router.With(authMiddleware).Post("/api/content-policies", s.createContentPolicyHandler)
+	s.router.Get("/api/content-policies", s.listContentPoliciesHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
