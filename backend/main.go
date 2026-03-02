@@ -53,7 +53,7 @@ func main() {
 		&NotificationDelivery{},
 		&NotificationTemplate{},
 		&MessageEdit{},
-	)
+		&UserActivityLog{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -219,6 +219,14 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/messages/{id}/edit-count", s.getEditCountHandler)
 	s.router.With(authMiddleware).Delete("/api/message-edits/{id}", s.deleteEditHistoryHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/edited-messages", s.getEditedMessagesHandler)
+
+	// Activity audit logging routes
+	s.router.With(authMiddleware).Post("/api/audit/log", s.logUserActivityHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/activity", s.getUserActivityLogsHandler)
+	s.router.With(authMiddleware).Get("/api/audit/logs", s.getAllActivityLogsHandler)
+	s.router.With(authMiddleware).Get("/api/audit/stats", s.getActivityStatsHandler)
+	s.router.With(authMiddleware).Delete("/api/audit/logs/{id}", s.deleteActivityLogHandler)
+	s.router.With(authMiddleware).Get("/api/audit/suspicious", s.getSuspiciousActivityHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
