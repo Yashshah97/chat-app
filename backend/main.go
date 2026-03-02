@@ -146,6 +146,9 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/search/messages/chat/{id}", s.searchChatMessagesHandler)
 	s.router.With(authMiddleware).Get("/api/search/users", s.searchUsersHandler)
 	s.router.With(authMiddleware).Get("/api/search/chats", s.searchChatsHandler)
+	s.router.With(authMiddleware).Post("/api/search/advanced", s.advancedSearchHandler)
+	s.router.Get("/api/search/trending", s.getTrendingHandler)
+	s.router.With(authMiddleware).Get("/api/search/history/{userID}", s.getSearchHistoryHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
