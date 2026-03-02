@@ -126,6 +126,11 @@ func main() {
 		&NotificationSchedule{},
 		&NotificationBatch{},
 		&NotificationLog{},
+		&PerformanceAlert{},
+		&CPUMetric{},
+		&MemoryMetric{},
+		&DatabaseMetric{},
+		&ServiceMetric{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -470,6 +475,15 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/notifications/logs", s.getNotificationLogsHandler)
 	s.router.Get("/api/notifications/stats", s.getNotificationStatsHandler)
 	s.router.With(authMiddleware).Delete("/api/notifications/scheduled/{scheduleID}", s.cancelScheduledNotificationHandler)
+
+	// Performance monitoring routes
+	s.router.Get("/api/performance/cpu", s.getCPUMetricsHandler)
+	s.router.Get("/api/performance/memory", s.getMemoryMetricsHandler)
+	s.router.Get("/api/performance/database", s.getDatabaseMetricsHandler)
+	s.router.Get("/api/performance/services", s.getServiceMetricsHandler)
+	s.router.Post("/api/performance/alerts", s.createPerformanceAlertHandler)
+	s.router.Get("/api/performance/alerts", s.getPerformanceAlertsHandler)
+	s.router.Get("/api/performance/system", s.getSystemPerformanceHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
