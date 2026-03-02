@@ -49,6 +49,9 @@ func main() {
 		&BlockedUser{},
 		&MutedUser{},
 		&ForwardedMessage{},
+		&Notification{},
+		&NotificationDelivery{},
+		&NotificationTemplate{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -185,6 +188,29 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/messages/{id}/forward", s.forwardMessageHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/forwarded", s.getForwardedMessagesHandler)
 	s.router.With(authMiddleware).Post("/api/messages/{id}/forward-to-multiple", s.forwardToMultipleHandler)
+	
+	// Notification routes
+	s.router.With(authMiddleware).Post("/api/notifications", s.createNotificationHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/notifications", s.getUserNotificationsHandler)
+	s.router.With(authMiddleware).Put("/api/notifications/{id}/read", s.markNotificationReadHandler)
+	s.router.With(authMiddleware).Post("/api/users/{id}/notifications/mark-all-read", s.markAllNotificationsReadHandler)
+	s.router.With(authMiddleware).Delete("/api/notifications/{id}", s.deleteNotificationHandler)
+	s.router.With(authMiddleware).Get("/api/users/{id}/notifications/unread-count", s.getUnreadNotificationCountHandler)
+	
+	// Notification delivery routes
+	s.router.With(authMiddleware).Post("/api/notifications/{id}/deliver", s.sendNotificationHandler)
+	s.router.With(authMiddleware).Get("/api/notifications/{id}/delivery-status", s.getDeliveryStatusHandler)
+	s.router.With(authMiddleware).Put("/api/notifications/delivery/{id}/mark-delivered", s.markDeliveredHandler)
+	s.router.With(authMiddleware).Post("/api/notifications/delivery/{id}/retry", s.retryDeliveryHandler)
+	s.router.Get("/api/notifications/delivery/stats", s.getDeliveryStatsHandler)
+	
+	// Notification template routes
+	s.router.With(authMiddleware).Post("/api/notifications/templates", s.createNotificationTemplateHandler)
+	s.router.With(authMiddleware).Get("/api/notifications/templates", s.listNotificationTemplatesHandler)
+	s.router.With(authMiddleware).Get("/api/notifications/templates/{id}", s.getNotificationTemplateHandler)
+	s.router.With(authMiddleware).Put("/api/notifications/templates/{id}", s.updateNotificationTemplateHandler)
+	s.router.With(authMiddleware).Delete("/api/notifications/templates/{id}", s.deleteNotificationTemplateHandler)
+	s.router.With(authMiddleware).Post("/api/notifications/from-template", s.createNotificationFromTemplateHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
