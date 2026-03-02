@@ -37,6 +37,9 @@ func main() {
 		&AdminUser{},
 		&AdminAction{},
 		&UserReport{},
+		&ChatAnalytics{},
+		&UserAnalytics{},
+		&SystemAnalytics{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -120,6 +123,13 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Post("/api/admin/reports/{id}/resolve", s.resolveReportHandler)
 	s.router.With(authMiddleware).Post("/api/admin/actions", s.logAdminActionHandler)
 	s.router.With(authMiddleware).Get("/api/admin/actions", s.listAdminActionsHandler)
+	
+	// Analytics routes
+	s.router.With(authMiddleware).Get("/api/analytics/system", s.getSystemAnalyticsHandler)
+	s.router.With(authMiddleware).Get("/api/analytics/chat/{id}", s.getChatAnalyticsHandler)
+	s.router.With(authMiddleware).Get("/api/analytics/user/{id}", s.getUserAnalyticsHandler)
+	s.router.With(authMiddleware).Post("/api/analytics/compute", s.computeAnalyticsHandler)
+	s.router.With(authMiddleware).Get("/api/analytics/dashboard", s.getAnalyticsDashboardHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
