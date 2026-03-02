@@ -72,6 +72,11 @@ func main() {
 		&WebhookEvent{},
 		&WebhookLog{},
 		&IncomingWebhook{},
+		&RateLimitConfig{},
+		&RateLimitUsage{},
+		&RateLimitViolation{},
+		&APIVersion{},
+		&APIEndpoint{},
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
@@ -294,6 +299,18 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Get("/api/webhooks/{id}/logs", s.getWebhookLogsHandler)
 	s.router.With(authMiddleware).Post("/api/chats/{id}/incoming-webhooks", s.createIncomingWebhookHandler)
 	s.router.With(authMiddleware).Get("/api/chats/{id}/incoming-webhooks", s.listIncomingWebhooksHandler)
+
+	// Rate limiting and API versioning routes
+	s.router.With(authMiddleware).Post("/api/rate-limit-config", s.createRateLimitConfigHandler)
+	s.router.With(authMiddleware).Get("/api/rate-limit-config", s.listRateLimitConfigsHandler)
+	s.router.With(authMiddleware).Get("/api/rate-limit-usage", s.getRateLimitUsageHandler)
+	s.router.With(authMiddleware).Get("/api/rate-limit-violations", s.getRateLimitViolationsHandler)
+	s.router.With(authMiddleware).Post("/api/api-versions", s.createAPIVersionHandler)
+	s.router.Get("/api/api-versions", s.listAPIVersionsHandler)
+	s.router.Get("/api/api-versions/{version}", s.getAPIVersionHandler)
+	s.router.With(authMiddleware).Post("/api/api-endpoints", s.registerAPIEndpointHandler)
+	s.router.Get("/api/api-endpoints", s.listAPIEndpointsHandler)
+	s.router.Get("/api/api-docs", s.getAPIDocsHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
