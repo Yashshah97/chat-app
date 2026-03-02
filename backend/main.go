@@ -52,6 +52,7 @@ func main() {
 		&Notification{},
 		&NotificationDelivery{},
 		&NotificationTemplate{},
+		&MessageEdit{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
@@ -211,6 +212,13 @@ func (s *Server) setupRoutes() {
 	s.router.With(authMiddleware).Put("/api/notifications/templates/{id}", s.updateNotificationTemplateHandler)
 	s.router.With(authMiddleware).Delete("/api/notifications/templates/{id}", s.deleteNotificationTemplateHandler)
 	s.router.With(authMiddleware).Post("/api/notifications/from-template", s.createNotificationFromTemplateHandler)
+	
+	// Message editing routes
+	s.router.With(authMiddleware).Put("/api/messages/{id}", s.editMessageHandler)
+	s.router.With(authMiddleware).Get("/api/messages/{id}/history", s.getMessageHistoryHandler)
+	s.router.With(authMiddleware).Get("/api/messages/{id}/edit-count", s.getEditCountHandler)
+	s.router.With(authMiddleware).Delete("/api/message-edits/{id}", s.deleteEditHistoryHandler)
+	s.router.With(authMiddleware).Get("/api/chats/{id}/edited-messages", s.getEditedMessagesHandler)
 
 	// Health check
 	s.router.Get("/health", s.healthHandler)
